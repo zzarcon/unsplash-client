@@ -32,7 +32,14 @@
   "files": [
     "dist"
   ],
-  "keywords": [],
+  "keywords": [
+    "unsplash",
+    "unsplash-api",
+    "unsplash-client",
+    "photos",
+    "api",
+    "free"
+  ],
   "dependencies": {
     "stringify-params": "^0.0.2"
   }
