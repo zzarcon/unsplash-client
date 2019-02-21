@@ -42,5 +42,8 @@
   ],
   "dependencies": {
     "stringify-params": "^0.0.2"
+  },
+  "resolutions": {
+    "terser": "^3.16.1"
   }
 }
