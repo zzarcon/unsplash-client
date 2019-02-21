@@ -15,7 +15,17 @@ const localStorageKey = 'unsplash-client-key';
 const repoUrl = 'https://github.com/zzarcon/unsplash-client';
 const defaultAccessKey = localStorage.getItem(localStorageKey) || '';
 
+const delayFn = (fn: Function, timeout: number) => {
+  let timeoutId: number;
+
+  return (...args: any[]) => {
+    window.clearTimeout(timeoutId);
+    timeoutId = window.setTimeout(() => fn(...args), timeout)
+  }
+};
+
 export default class App extends Component <{}, AppState> {
+  search: Function;
   client: Unsplash = new Unsplash(defaultAccessKey);
   state: AppState = {
     query: 'skateboarding',
@@ -23,11 +33,19 @@ export default class App extends Component <{}, AppState> {
     photos: []
   }
 
+  constructor(props: {}) {
+    super(props);
+
+    this.search = delayFn(async (query: string, perPage: number = 50) => {
+      const photos = await this.client.search(query, {perPage});
+      this.setState({photos})
+    }, 500)
+  }
+
   onQueryChange = async (event: any) => {
     const query = event.target.value;
     this.setState({query});
-    const photos = await this.client.search(query, {perPage: 50});
-    this.setState({photos})
+    this.search(query, 20);
   }
 
   onAccessKeyChange = (event: any) => {

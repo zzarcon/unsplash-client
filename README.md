@@ -3,7 +3,7 @@
 
 ### Features
 
-* Bundle size: 
+* Bundle size: [0.5kB](https://bundlephobia.com/result?p=unsplash-client) vs [6kB unsplash-js ](https://bundlephobia.com/result?p=unsplash-js)
 * Type safe
 
 ### Installation
