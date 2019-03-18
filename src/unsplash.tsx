@@ -16,17 +16,21 @@ export interface SearchResponse {
   height: number;
   width: number;
   urls: Urls;
+  description: string;
 }
 
-interface SearchRawResponse {
-  results: {
-    id: string;
-    created_at: string;
-    height: number;
-    width: number;
-    urls: Urls;
-  }[];
+interface SearchRawResponseResult {
+  id: string;
+  created_at: string;
+  height: number;
+  width: number;
+  urls: Urls;
+  description: string;
 }
+interface SearchRawResponse {
+  results: SearchRawResponseResult[];
+}
+
 const apiUrl = 'https://api.unsplash.com';
 
 // TODO: add support for AbortController ?
@@ -40,12 +44,23 @@ export class Unsplash {
       page: params.page
     });
 
-    return response.results.map(result => ({
+    return this.mapResponse(response.results);
+  }
+
+  async random(count: number = 10): Promise<SearchResponse[]> {
+    const response = await this.request<SearchRawResponseResult[]>('/photos/random', {count})
+    
+    return this.mapResponse(response);
+  }
+
+  private mapResponse = (results: SearchRawResponseResult[]): SearchResponse[] => {
+    return results.map(result => ({
       id: result.id,
       createdAt: result.created_at,
       height: result.height,
       width: result.width,
-      urls: result.urls
+      urls: result.urls,
+      description: result.description
     }));
   }
 
