@@ -53,7 +53,7 @@ const apiUrl = 'https://api.unsplash.com';
 
 // TODO: add support for AbortController ?
 export class Unsplash {
-  constructor(private accessKey: string) {}
+  constructor(private accessKey: string, private fetcher: typeof fetch = fetch) {}
 
   async search(query: string, params: SearchOptions = {perPage: 10, page: 1}): Promise<PhotoResponse[]> {
     const { results } = await this.request<SearchRawResponse>('/search/photos', {
@@ -94,7 +94,7 @@ export class Unsplash {
       ...params
     })
     const url = `${apiUrl}${path}${stringifiedParams}`;
-    const response = await (await fetch(url)).json();
+    const response = await (await this.fetcher(url)).json();
 
     return response;
   }
