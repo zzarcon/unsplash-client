@@ -10,26 +10,44 @@ interface Urls {
   small: string;
   thumb: string;
 }
-export interface SearchResponse {
+interface User {
   id: string;
-  createdAt: string;
-  height: number;
-  width: number;
-  urls: Urls;
-  description: string;
+  username: string;
+  name: string;
+  bio: string;
+}
+interface Links {
+  self: string;
+  html: string;
+  download: string;
+  download_location: string;
 }
 
-interface SearchRawResponseResult {
+interface PhotoRawResponse {
   id: string;
   created_at: string;
   height: number;
   width: number;
   urls: Urls;
   description: string;
+  user: User;
+  links: Links;
 }
+export interface PhotoResponse {
+  id: string;
+  createdAt: string;
+  width: number;
+  height: number;
+  urls: Urls;
+  description: string;
+  user: User;
+  links: Links;
+}
+
 interface SearchRawResponse {
-  results: SearchRawResponseResult[];
+  results: PhotoRawResponse[];
 }
+export type SearchResponse = PhotoResponse;
 
 const apiUrl = 'https://api.unsplash.com';
 
@@ -37,32 +55,38 @@ const apiUrl = 'https://api.unsplash.com';
 export class Unsplash {
   constructor(private accessKey: string) {}
 
-  async search(query: string, params: SearchOptions = {perPage: 10, page: 1}): Promise<SearchResponse[]> {
-    const response = await this.request<SearchRawResponse>('/search/photos', {
+  async search(query: string, params: SearchOptions = {perPage: 10, page: 1}): Promise<PhotoResponse[]> {
+    const { results } = await this.request<SearchRawResponse>('/search/photos', {
       query,
       per_page: params.perPage,
       page: params.page
     });
 
-    return this.mapResponse(response.results);
+    return results.map(this.mapResponse);
   }
 
-  async random(count: number = 10): Promise<SearchResponse[]> {
-    const response = await this.request<SearchRawResponseResult[]>('/photos/random', {count})
+  async random(count: number = 10): Promise<PhotoResponse[]> {
+    const response = await this.request<PhotoRawResponse[]>('/photos/random', {count})
     
+    return response.map(this.mapResponse);
+  }
+
+  async lookup(id: string): Promise<PhotoResponse> {
+    const response = await this.request<PhotoRawResponse>(`/photos/${id}`);
+
     return this.mapResponse(response);
   }
 
-  private mapResponse = (results: SearchRawResponseResult[]): SearchResponse[] => {
-    return results.map(result => ({
-      id: result.id,
-      createdAt: result.created_at,
-      height: result.height,
-      width: result.width,
-      urls: result.urls,
-      description: result.description
-    }));
-  }
+  private mapResponse = (photo: PhotoRawResponse): PhotoResponse => ({
+    id: photo.id,
+    createdAt: photo.created_at,
+    height: photo.height,
+    width: photo.width,
+    urls: photo.urls,
+    description: photo.description,
+    user: photo.user,
+    links: photo.links,
+  });
 
   private async request<T>(path: string, params?: QueryParams): Promise<T> {
     const stringifiedParams = stringifyParams({
