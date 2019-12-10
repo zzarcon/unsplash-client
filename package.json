@@ -9,7 +9,7 @@
   "devDependencies": {
     "@atlaskit/field-text": "^7.0.20",
     "react-masonry-component": "^6.2.1",
-    "ts-react-toolbox": "^0.2.2"
+    "ts-react-toolbox": "^0.2.11"
   },
   "engines": {
     "node": ">=8.5.0"
